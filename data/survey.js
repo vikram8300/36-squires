@@ -1,6 +1,15 @@
-// 36 Squires Path — Survey Data
+// 36 Squires Path — Survey Data (CORRECTED from aerial + Benz survey)
 // Source: Gary Benz, L.S. survey dated 5/19/2021, Job No. G21-7085
 // Coordinate system: feet, SW corner = (0,0), +X = east, +Y = north
+//
+// KEY LAYOUT (from aerial):
+//   - House is center-east of lot, L-shaped (1-story NW, 2-story SE)
+//   - Driveway horseshoe is ENTIRELY WEST of the house
+//   - Bottom of the U sweeps across the front (south) of the house entrance
+//   - Both curb cuts on Squires Path are near the SW corner
+//   - Trees are INSIDE the horseshoe (between the two arms)
+//   - Pool is EAST of the house
+//   - Pond is NE corner
 
 const SURVEY = {
   property: {
@@ -15,7 +24,6 @@ const SURVEY = {
     scale: '1 inch = 30 feet'
   },
 
-  // Boundary corners in survey feet (SW = origin)
   corners: {
     SW: [0, 0],
     NW: [127.20, 141.64],
@@ -23,104 +31,151 @@ const SURVEY = {
     SE: [81.85, -73.49]
   },
 
-  // Boundary edges (clockwise from SW)
   edges: [
-    { from: 'SW', to: 'NW', bearing: 'N41°55\'30"E', distance: 190.37, label: 'Stephen Hands Path / Preserve Buffer' },
+    { from: 'SW', to: 'NW', bearing: 'N41°55\'30"E', distance: 190.37, label: 'Stephen Hands Path' },
     { from: 'NW', to: 'NE', bearing: 'S57°06\'10"E', distance: 111.38, label: 'North Side' },
-    { from: 'NE', to: 'SE', bearing: 'S41°55\'30"W', distance: 207.84, label: 'Preserve Boundary (East)' },
-    { from: 'SE', to: 'SW', bearing: 'N48°04\'30"W', distance: 110.00, label: 'Squires Path Frontage' }
+    { from: 'NE', to: 'SE', bearing: 'S41°55\'30"W', distance: 207.84, label: 'Preserve (East)' },
+    { from: 'SE', to: 'SW', bearing: 'N48°04\'30"W', distance: 110.00, label: 'Squires Path' }
   ],
 
-  // Rotation to make Squires Path horizontal (driver's view)
-  // Computed from bearing of south edge (N48°04'30"W → math angle 138°, need 180°, so rotate +42°)
   rotationDeg: 42,
 
-  // Structures — positions in survey feet from SW origin
+  // House — L-shaped footprint as polygon vertices (clockwise from SW of 2-story)
+  // 2-story section: south/east portion, ~52' wide × 30' deep
+  // 1-story section: north/west extension, ~36' wide × 26' deep
+  // Brick porch: extends south from 2-story section
   house: {
-    // Approximate center from aerial + survey overlay
-    center: [110, 35],
-    width: 52,   // east-west
-    depth: 48,   // north-south
     sqft: 3424,
-    label: 'Residence (3,424 sf)',
-    sections: [
-      { type: '1-story frame', position: 'NW portion' },
-      { type: '2-story frame', position: 'SE portion' }
+    label: 'Residence',
+    entranceFacing: 'south/southwest (toward driveway)',
+
+    // L-shaped footprint polygon (survey feet, clockwise)
+    footprint: [
+      [88, 2],    // SW corner of 2-story section
+      [140, 2],   // SE corner of 2-story section
+      [140, 32],  // NE corner of 2-story section
+      [118, 32],  // step inward where 1-story begins
+      [118, 58],  // NE corner of 1-story section
+      [82, 58],   // NW corner of 1-story section
+      [82, 32],   // SW corner of 1-story section
+      [88, 32]    // back to 2-story NW corner
     ],
+
+    // Brick porch (south of 2-story, where front door is)
+    porch: [
+      [95, -4],
+      [125, -4],
+      [125, 2],
+      [95, 2]
+    ],
+
+    // Front door location (on porch, facing SW toward driveway)
+    frontDoor: [100, -2],
+
+    // Labels for sections
+    sections: [
+      { label: '2-STORY', center: [114, 17] },
+      { label: '1-STORY', center: [100, 45] }
+    ],
+
+    // Chimney approximate position
+    chimney: [108, 28],
+
     features: ['chimney', 'brick porch (south)', 'solar panels on roof']
   },
 
   pool: {
-    center: [155, 25],
-    width: 15,
-    depth: 30,
+    center: [162, 18],
+    width: 16,
+    depth: 32,
     label: 'Heated Pool',
+    // Pool corners
+    corners: [
+      [154, 2], [170, 2], [170, 34], [154, 34]
+    ],
     features: ['waterfall', 'safety fence', 'outdoor shower']
   },
 
   pond: {
     center: [195, 65],
-    radius: 15,
+    radius: 12,
     label: 'Pond',
     note: 'Partially on property, near preserve boundary'
   },
 
   buriedPropane: {
-    center: [95, 78],
+    center: [90, 72],
     label: 'Buried LPG'
   },
 
-  // Two large trees that MUST be preserved
-  // Located inside the current horseshoe loop, flanking west side of house
+  // Two large trees INSIDE the horseshoe loop (between the two driveway arms)
   trees: [
     {
       id: 'tree-south',
-      center: [68, 8],
-      canopyRadius: 14,
-      label: 'Preserved Tree (South)',
-      note: 'Large hardwood, inside current driveway loop'
+      center: [54, 12],
+      canopyRadius: 13,
+      label: 'Preserved Tree',
+      note: 'Large hardwood, inside driveway loop (south)'
     },
     {
       id: 'tree-north',
-      center: [72, 52],
-      canopyRadius: 12,
-      label: 'Preserved Tree (North)',
-      note: 'Large hardwood, inside current driveway loop'
+      center: [56, 45],
+      canopyRadius: 11,
+      label: 'Preserved Tree',
+      note: 'Large hardwood, inside driveway loop (north)'
     }
   ],
 
-  // Current driveway to be demolished
+  // Current driveway — horseshoe/U-shape, ENTIRELY WEST of house
+  // Both curb cuts near SW corner on Squires Path
+  // Bottom of U sweeps across front of house entrance
   currentDriveway: {
     type: 'Cobblestone + Gravel',
-    shape: 'C-shaped / Horseshoe Loop',
-    description: 'Two entry/exit points from Squires Path. Curves north along west side of house.',
-    // Path points (survey feet) tracing the loop
+    shape: 'U-shaped / Horseshoe Loop',
+    description: 'West arm goes north along west property area. East arm returns south closer to house. Bottom of U crosses in front of house entrance. Both exits near SW corner.',
+    // West arm (entry, going north from Squires Path)
+    westArm: [
+      [15, -28], [18, -14], [22, 2], [26, 16], [32, 30], [38, 44], [45, 56]
+    ],
+    // Top curve (connecting west arm to east arm)
+    topCurve: [
+      [52, 64], [60, 68], [68, 65]
+    ],
+    // East arm (going south, east of west arm, still west of house)
+    eastArm: [
+      [72, 56], [75, 44], [76, 32], [76, 20], [74, 8]
+    ],
+    // Bottom of U (sweeping across front of house entrance)
+    bottomCurve: [
+      [70, -2], [62, -10], [52, -18], [42, -24], [32, -30]
+    ],
+    // Full path for rendering (combined)
     path: [
-      [22, -20], [28, -5], [35, 15], [45, 35], [55, 55],
-      [65, 65], [80, 70], [95, 65], [100, 55], [100, 42],
-      [95, 28], [88, 15], [80, 2], [72, -12], [62, -25], [52, -42]
+      // West arm
+      [15, -28], [18, -14], [22, 2], [26, 16], [32, 30], [38, 44], [45, 56],
+      // Top curve
+      [52, 64], [60, 68], [68, 65],
+      // East arm
+      [72, 56], [75, 44], [76, 32], [76, 20], [74, 8],
+      // Bottom curve (across house front)
+      [70, -2], [62, -10], [52, -18], [42, -24], [32, -30]
     ]
   },
 
-  // Road reference
   road: {
     label: 'Squires Path',
-    // The road runs along the south edge (SE to SW)
-    // Edge of pavement is 5' from SW corner
     pavementOffset: 5
   },
 
-  // Adjacent parcels
   adjacent: {
     north: { label: 'Nature Preserve', sctm: '300-184-2-7 & 8', note: 'Town of East Hampton' },
-    east: { label: 'Nature Preserve', sctm: '300-184-2-7 & 8', note: 'Direct boundary, no buffer' },
+    east: { label: 'Nature Preserve', sctm: '300-184-2-7 & 8', note: 'Direct boundary' },
     south: { label: 'Squires Path', note: 'Public road' },
-    southwest: { label: 'Lot 38', note: 'Residential neighbor' }
+    southwest: { label: 'Lot 38', note: 'Residential neighbor (300-184-2-10.002)' }
   },
 
-  // Setback reference points from survey
   setbacks: {
-    frontRight: 25.00, // from SW corner
-    frontLeft: 39.27   // from SW corner
+    frontRight: 25.00,
+    frontLeft: 39.27
   }
 };

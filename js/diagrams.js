@@ -245,46 +245,83 @@ function renderCurrentDriveway(g) {
 
 function renderStructures(g) {
   const h = SURVEY.house;
-  const hc = CoordSystem.transformCenter(h.center[0], h.center[1]);
-  const hw = h.width * 0.7;  // approximate scale in rotated view
-  const hd = h.depth * 0.7;
 
-  // House footprint (simplified rectangle)
-  const houseCorners = [
-    [h.center[0] - h.width / 2, h.center[1] - h.depth / 2],
-    [h.center[0] + h.width / 2, h.center[1] - h.depth / 2],
-    [h.center[0] + h.width / 2, h.center[1] + h.depth / 2],
-    [h.center[0] - h.width / 2, h.center[1] + h.depth / 2]
-  ];
+  // House L-shaped footprint (polygon)
   g.appendChild(svgEl('polygon', {
-    points: CoordSystem.toPointsStr(houseCorners),
+    points: CoordSystem.toPointsStr(h.footprint),
     fill: '#e8e4de', stroke: '#555', 'stroke-width': '1.2'
   }));
 
-  // House label
-  g.appendChild(svgText(hc[0], hc[1] - 3, 'RESIDENCE', {
-    'font-size': '4.5', fill: '#444', 'text-anchor': 'middle',
+  // Brick porch
+  if (h.porch) {
+    g.appendChild(svgEl('polygon', {
+      points: CoordSystem.toPointsStr(h.porch),
+      fill: '#d8c8b8', stroke: '#888', 'stroke-width': '0.6'
+    }));
+    // Porch label
+    const porchC = CoordSystem.transformCenter(110, -1);
+    g.appendChild(svgText(porchC[0], porchC[1], 'PORCH', {
+      'font-size': '2.2', fill: '#888', 'text-anchor': 'middle',
+      'font-family': '"IBM Plex Mono", monospace'
+    }));
+  }
+
+  // Section labels (1-story, 2-story)
+  if (h.sections) {
+    h.sections.forEach(sec => {
+      const sc = CoordSystem.transformCenter(sec.center[0], sec.center[1]);
+      g.appendChild(svgText(sc[0], sc[1], sec.label, {
+        'font-size': '3.5', fill: '#555', 'text-anchor': 'middle',
+        'font-weight': '500', 'font-family': '"IBM Plex Mono", monospace'
+      }));
+    });
+  }
+
+  // Main label at house centroid
+  const centroidX = h.footprint.reduce((s, p) => s + p[0], 0) / h.footprint.length;
+  const centroidY = h.footprint.reduce((s, p) => s + p[1], 0) / h.footprint.length;
+  const hc = CoordSystem.transformCenter(centroidX, centroidY);
+  g.appendChild(svgText(hc[0], hc[1] - 6, 'RESIDENCE', {
+    'font-size': '4', fill: '#444', 'text-anchor': 'middle',
     'font-weight': '600', 'font-family': '"Inter", sans-serif'
   }));
-  g.appendChild(svgText(hc[0], hc[1] + 3, '3,424 sf', {
-    'font-size': '3', fill: '#777', 'text-anchor': 'middle',
-    'font-family': '"IBM Plex Mono", monospace'
-  }));
-  g.appendChild(svgText(hc[0], hc[1] + 7, '5 bed / 4.5 bath', {
-    'font-size': '2.8', fill: '#999', 'text-anchor': 'middle',
+  g.appendChild(svgText(hc[0], hc[1] - 1.5, '3,424 sf · 5 bed / 4.5 bath', {
+    'font-size': '2.5', fill: '#777', 'text-anchor': 'middle',
     'font-family': '"IBM Plex Mono", monospace'
   }));
 
+  // Front door marker
+  if (h.frontDoor) {
+    const fd = CoordSystem.transformCenter(h.frontDoor[0], h.frontDoor[1]);
+    g.appendChild(svgEl('rect', {
+      x: fd[0] - 3, y: fd[1] - 1.5, width: 6, height: 3, rx: '0.5',
+      fill: '#8B4513', stroke: '#5a2d0c', 'stroke-width': '0.5'
+    }));
+    g.appendChild(svgText(fd[0], fd[1] - 4, 'ENTRY', {
+      'font-size': '2', fill: '#8B4513', 'text-anchor': 'middle',
+      'font-family': '"IBM Plex Mono", monospace', 'font-weight': '600'
+    }));
+  }
+
+  // Chimney
+  if (h.chimney) {
+    const ch = CoordSystem.transformCenter(h.chimney[0], h.chimney[1]);
+    g.appendChild(svgEl('rect', {
+      x: ch[0] - 1.5, y: ch[1] - 1.5, width: 3, height: 3,
+      fill: '#999', stroke: '#666', 'stroke-width': '0.3'
+    }));
+  }
+
   // Pool
   const p = SURVEY.pool;
-  const poolCorners = [
+  const poolPts = p.corners || [
     [p.center[0] - p.width / 2, p.center[1] - p.depth / 2],
     [p.center[0] + p.width / 2, p.center[1] - p.depth / 2],
     [p.center[0] + p.width / 2, p.center[1] + p.depth / 2],
     [p.center[0] - p.width / 2, p.center[1] + p.depth / 2]
   ];
   g.appendChild(svgEl('polygon', {
-    points: CoordSystem.toPointsStr(poolCorners),
+    points: CoordSystem.toPointsStr(poolPts),
     fill: '#b8d4e8', stroke: '#7ba7c9', 'stroke-width': '0.8'
   }));
   const pc = CoordSystem.transformCenter(p.center[0], p.center[1]);
@@ -297,7 +334,7 @@ function renderStructures(g) {
   const pond = SURVEY.pond;
   const pondc = CoordSystem.transformCenter(pond.center[0], pond.center[1]);
   g.appendChild(svgEl('ellipse', {
-    cx: pondc[0], cy: pondc[1], rx: pond.radius * 0.8, ry: pond.radius * 0.6,
+    cx: pondc[0], cy: pondc[1], rx: pond.radius, ry: pond.radius * 0.7,
     fill: '#c5dae8', stroke: '#8bb5cc', 'stroke-width': '0.5', opacity: '0.7'
   }));
   g.appendChild(svgText(pondc[0], pondc[1] + 1.5, 'Pond', {
