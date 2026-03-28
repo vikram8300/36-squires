@@ -1,50 +1,36 @@
 // 36 Squires Path — Coordinate Transform Engine
-// Converts survey feet (SW=origin, +X=east, +Y=north) to SVG screen coordinates
+// NO ROTATION — draws the survey exactly as the Benz survey shows it.
+// Just flips Y (survey: +Y=north, SVG: +Y=down) and adds padding.
 
 const CoordSystem = (() => {
-  const DEG2RAD = Math.PI / 180;
-  const ROTATION_DEG = 42; // CCW rotation to make Squires Path horizontal
-
-  // Compute centroid of property
   const corners = SURVEY.corners;
-  const cx = (corners.SW[0] + corners.NW[0] + corners.NE[0] + corners.SE[0]) / 4;
-  const cy = (corners.SW[1] + corners.NW[1] + corners.NE[1] + corners.SE[1]) / 4;
 
-  const cosR = Math.cos(ROTATION_DEG * DEG2RAD);
-  const sinR = Math.sin(ROTATION_DEG * DEG2RAD);
-
-  // Transform a single survey point to rotated + Y-flipped coordinates
-  function toRotated(x, y) {
-    const dx = x - cx;
-    const dy = y - cy;
-    return [
-      cx + dx * cosR - dy * sinR,
-      -(cy + dx * sinR + dy * cosR) // flip Y for screen
-    ];
+  // Transform: just flip Y for SVG
+  function toSVG(x, y) {
+    return [x, -y];
   }
 
-  // Transform an array of [x, y] points
   function transformPoints(pts) {
-    return pts.map(p => toRotated(p[0], p[1]));
+    return pts.map(p => toSVG(p[0], p[1]));
   }
 
-  // Compute bounding box of transformed boundary corners
-  const transformedCorners = [
-    toRotated(...corners.SW),
-    toRotated(...corners.NW),
-    toRotated(...corners.NE),
-    toRotated(...corners.SE)
-  ];
+  function transformCenter(x, y) {
+    return toSVG(x, y);
+  }
+
+  // Compute bounding box
+  const allCorners = [corners.SW, corners.NW, corners.NE, corners.SE];
+  const svgCorners = allCorners.map(c => toSVG(c[0], c[1]));
 
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-  transformedCorners.forEach(([x, y]) => {
+  svgCorners.forEach(([x, y]) => {
     minX = Math.min(minX, x);
     minY = Math.min(minY, y);
     maxX = Math.max(maxX, x);
     maxY = Math.max(maxY, y);
   });
 
-  const PADDING = 55; // feet of padding around property
+  const PADDING = 40;
   const bounds = {
     x: minX - PADDING,
     y: minY - PADDING,
@@ -52,15 +38,12 @@ const CoordSystem = (() => {
     height: (maxY - minY) + PADDING * 2
   };
 
-  // SVG viewBox string
   const viewBox = `${bounds.x.toFixed(1)} ${bounds.y.toFixed(1)} ${bounds.width.toFixed(1)} ${bounds.height.toFixed(1)}`;
 
-  // Convert [x,y] array to SVG polygon/polyline points string
   function toPointsStr(pts) {
     return transformPoints(pts).map(p => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
   }
 
-  // Convert [x,y] array to SVG path d attribute
   function toPathD(pts, close) {
     const tp = transformPoints(pts);
     let d = `M ${tp[0][0].toFixed(1)} ${tp[0][1].toFixed(1)}`;
@@ -71,7 +54,6 @@ const CoordSystem = (() => {
     return d;
   }
 
-  // Create smooth curve path through points
   function toSmoothPathD(pts) {
     const tp = transformPoints(pts);
     if (tp.length < 2) return '';
@@ -80,7 +62,6 @@ const CoordSystem = (() => {
       d += ` L ${tp[1][0].toFixed(1)} ${tp[1][1].toFixed(1)}`;
       return d;
     }
-    // Catmull-Rom to Bezier
     for (let i = 0; i < tp.length - 1; i++) {
       const p0 = tp[Math.max(0, i - 1)];
       const p1 = tp[i];
@@ -95,20 +76,14 @@ const CoordSystem = (() => {
     return d;
   }
 
-  // Get transformed center point
-  function transformCenter(x, y) {
-    return toRotated(x, y);
-  }
-
-  // Compute offset point along a boundary edge (for setback lines)
-  // Takes two corner names and an offset distance (inward)
+  // Offset an edge inward by a distance (for setback lines)
   function offsetEdge(corner1Name, corner2Name, offset) {
     const c1 = corners[corner1Name];
     const c2 = corners[corner2Name];
     const dx = c2[0] - c1[0];
     const dy = c2[1] - c1[1];
     const len = Math.sqrt(dx * dx + dy * dy);
-    // Normal pointing inward (rotate 90° CW for inward on a CW polygon)
+    // Normal pointing inward (clockwise polygon)
     const nx = dy / len;
     const ny = -dx / len;
     return [
@@ -118,7 +93,7 @@ const CoordSystem = (() => {
   }
 
   return {
-    toRotated,
+    toSVG,
     transformPoints,
     transformCenter,
     toPointsStr,
@@ -127,7 +102,6 @@ const CoordSystem = (() => {
     offsetEdge,
     viewBox,
     bounds,
-    centroid: [cx, cy],
-    transformedCorners
+    svgCorners
   };
 })();

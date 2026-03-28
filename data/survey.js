@@ -1,15 +1,14 @@
-// 36 Squires Path — Survey Data (CORRECTED from aerial + Benz survey)
-// Source: Gary Benz, L.S. survey dated 5/19/2021, Job No. G21-7085
+// 36 Squires Path — Survey Data
+// Source: Gary Benz, L.S. survey 5/19/2021, Job No. G21-7085
 // Coordinate system: feet, SW corner = (0,0), +X = east, +Y = north
 //
-// KEY LAYOUT (from aerial):
-//   - House is center-east of lot, L-shaped (1-story NW, 2-story SE)
-//   - Driveway horseshoe is ENTIRELY WEST of the house
-//   - Bottom of the U sweeps across the front (south) of the house entrance
-//   - Both curb cuts on Squires Path are near the SW corner
-//   - Trees are INSIDE the horseshoe (between the two arms)
-//   - Pool is EAST of the house
-//   - Pond is NE corner
+// NO ROTATION is applied — the diagram matches the Benz survey orientation.
+// House walls are parallel to lot boundary edges (tilted ~42° from horiz).
+//
+// House/structure positions computed from lot's axis system:
+//   u = distance along west boundary (SW→NW direction, bearing N41°55'30"E)
+//   v = distance perpendicular into the lot (east-ish)
+//   (u,v) → survey: x = u*0.6681 + v*0.7440, y = u*0.7440 - v*0.6681
 
 const SURVEY = {
   property: {
@@ -38,127 +37,104 @@ const SURVEY = {
     { from: 'SE', to: 'SW', bearing: 'N48°04\'30"W', distance: 110.00, label: 'Squires Path' }
   ],
 
-  rotationDeg: 42,
-
-  // House — L-shaped footprint as polygon vertices (clockwise from SW of 2-story)
-  // 2-story section: south/east portion, ~52' wide × 30' deep
-  // 1-story section: north/west extension, ~36' wide × 26' deep
-  // Brick porch: extends south from 2-story section
+  // House — L-shaped, walls parallel to lot boundary
+  // 2-story section (south/SE, closer to Squires Path): u=42→70, v=30→65
+  // 1-story section (north/NW, extends further west): u=70→95, v=22→55
   house: {
     sqft: 3424,
     label: 'Residence',
-    entranceFacing: 'south/southwest (toward driveway)',
 
-    // L-shaped footprint polygon (survey feet, clockwise)
+    // L-shaped footprint (survey coords, clockwise from 2-story SW corner)
     footprint: [
-      [88, 2],    // SW corner of 2-story section
-      [140, 2],   // SE corner of 2-story section
-      [140, 32],  // NE corner of 2-story section
-      [118, 32],  // step inward where 1-story begins
-      [118, 58],  // NE corner of 1-story section
-      [82, 58],   // NW corner of 1-story section
-      [82, 32],   // SW corner of 1-story section
-      [88, 32]    // back to 2-story NW corner
+      [50.4, 11.2],   // 2-story SW (u=42, v=30) — front-left
+      [76.4, -12.2],  // 2-story SE (u=42, v=65) — front-right
+      [95.1, 8.7],    // 2-story NE (u=70, v=65) — back-right
+      [87.7, 15.3],   // step in: 1-story SE (u=70, v=55) — 1-story narrower on east
+      [104.4, 33.9],  // 1-story NE (u=95, v=55)
+      [79.8, 56.0],   // 1-story NW (u=95, v=22)
+      [63.1, 37.4],   // 1-story SW (u=70, v=22) — extends further west
+      [69.1, 32.0]    // 2-story NW (u=70, v=30) — step back east
     ],
 
-    // Brick porch (south of 2-story, where front door is)
+    // Brick porch (extends south from 2-story front face)
     porch: [
-      [95, -4],
-      [125, -4],
-      [125, 2],
-      [95, 2]
+      [53.7, 2.9],    // (u=38, v=38)
+      [66.3, -8.5],   // (u=38, v=55)
+      [69.0, -5.5],   // (u=42, v=55)
+      [56.3, 5.9]     // (u=42, v=38)
     ],
 
-    // Front door location (on porch, facing SW toward driveway)
-    frontDoor: [100, -2],
+    frontDoor: [61.3, -1.3],  // center of porch front face
 
-    // Labels for sections
     sections: [
-      { label: '2-STORY', center: [114, 17] },
-      { label: '1-STORY', center: [100, 45] }
+      { label: '1-STORY', center: [84.0, 41.0] },   // center of 1-story section
+      { label: '2-STORY', center: [73.0, 5.0] }      // center of 2-story section
     ],
 
-    // Chimney approximate position
-    chimney: [108, 28],
+    chimney: [82.0, 23.0],
 
     features: ['chimney', 'brick porch (south)', 'solar panels on roof']
   },
 
+  // Pool — east of house (u=78→93, v=60→75)
   pool: {
-    center: [162, 18],
-    width: 16,
-    depth: 32,
+    center: [107.3, 18.5],
+    width: 15,
+    depth: 30,
     label: 'Heated Pool',
-    // Pool corners
     corners: [
-      [154, 2], [170, 2], [170, 34], [154, 34]
+      [96.8, 17.9],   // (u=78, v=60)
+      [107.9, 7.9],   // (u=78, v=75)
+      [117.9, 19.1],  // (u=93, v=75)
+      [106.8, 29.1]   // (u=93, v=60)
     ],
-    features: ['waterfall', 'safety fence', 'outdoor shower']
+    features: ['waterfall', 'safety fence']
   },
 
+  // Pond — NE area (u=100, v=72)
   pond: {
-    center: [195, 65],
+    center: [120.4, 26.3],
     radius: 12,
-    label: 'Pond',
-    note: 'Partially on property, near preserve boundary'
+    label: 'Pond'
   },
 
+  // LPG — north of 1-story (u=90, v=35)
   buriedPropane: {
-    center: [90, 72],
+    center: [86.2, 43.6],
     label: 'Buried LPG'
   },
 
-  // Two large trees INSIDE the horseshoe loop (between the two driveway arms)
+  // Trees — inside the horseshoe loop (between driveway arms)
   trees: [
     {
       id: 'tree-south',
-      center: [54, 12],
-      canopyRadius: 13,
-      label: 'Preserved Tree',
-      note: 'Large hardwood, inside driveway loop (south)'
+      center: [28.6, 7.9],    // (u=25, v=16)
+      canopyRadius: 12,
+      label: 'Preserved Tree'
     },
     {
       id: 'tree-north',
-      center: [56, 45],
-      canopyRadius: 11,
-      label: 'Preserved Tree',
-      note: 'Large hardwood, inside driveway loop (north)'
+      center: [48.7, 30.2],   // (u=55, v=16)
+      canopyRadius: 10,
+      label: 'Preserved Tree'
     }
   ],
 
-  // Current driveway — horseshoe/U-shape, ENTIRELY WEST of house
-  // Both curb cuts near SW corner on Squires Path
-  // Bottom of U sweeps across front of house entrance
+  // Current driveway — horseshoe, entirely west of house
   currentDriveway: {
     type: 'Cobblestone + Gravel',
     shape: 'U-shaped / Horseshoe Loop',
-    description: 'West arm goes north along west property area. East arm returns south closer to house. Bottom of U crosses in front of house entrance. Both exits near SW corner.',
-    // West arm (entry, going north from Squires Path)
-    westArm: [
-      [15, -28], [18, -14], [22, 2], [26, 16], [32, 30], [38, 44], [45, 56]
-    ],
-    // Top curve (connecting west arm to east arm)
-    topCurve: [
-      [52, 64], [60, 68], [68, 65]
-    ],
-    // East arm (going south, east of west arm, still west of house)
-    eastArm: [
-      [72, 56], [75, 44], [76, 32], [76, 20], [74, 8]
-    ],
-    // Bottom of U (sweeping across front of house entrance)
-    bottomCurve: [
-      [70, -2], [62, -10], [52, -18], [42, -24], [32, -30]
-    ],
-    // Full path for rendering (combined)
     path: [
-      // West arm
-      [15, -28], [18, -14], [22, 2], [26, 16], [32, 30], [38, 44], [45, 56],
+      // West arm (entry from Squires Path, going north)
+      [9.3, -1.6],   [16.0, 5.8],  [29.3, 20.7],  [40.1, 31.2],
+      [50.9, 41.7],  [59.0, 47.8],
       // Top curve
-      [52, 64], [60, 68], [68, 65],
-      // East arm
-      [72, 56], [75, 44], [76, 32], [76, 20], [74, 8],
-      // Bottom curve (across house front)
-      [70, -2], [62, -10], [52, -18], [42, -24], [32, -30]
+      [65.9, 51.0],  [71.7, 49.9],  [73.4, 44.3],
+      // East arm (going south)
+      [69.5, 38.4],  [63.5, 30.3],  [56.8, 22.9],
+      [49.4, 16.1],  [44.0, 11.6],
+      // Bottom of U (across front of house)
+      [37.8, 9.1],   [30.1, 6.6],   [22.5, 4.0],   [15.5, 2.3]
     ]
   },
 
@@ -168,10 +144,10 @@ const SURVEY = {
   },
 
   adjacent: {
-    north: { label: 'Nature Preserve', sctm: '300-184-2-7 & 8', note: 'Town of East Hampton' },
-    east: { label: 'Nature Preserve', sctm: '300-184-2-7 & 8', note: 'Direct boundary' },
-    south: { label: 'Squires Path', note: 'Public road' },
-    southwest: { label: 'Lot 38', note: 'Residential neighbor (300-184-2-10.002)' }
+    north: { label: 'Nature Preserve', sctm: '300-184-2-7 & 8' },
+    east: { label: 'Nature Preserve', sctm: '300-184-2-7 & 8' },
+    south: { label: 'Squires Path' },
+    southwest: { label: 'Lot 38' }
   },
 
   setbacks: {
