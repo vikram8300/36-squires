@@ -1,13 +1,27 @@
 // 36 Squires Path — Coordinate Transform Engine
-// NO ROTATION — draws the survey exactly as the Benz survey shows it.
-// Just flips Y (survey: +Y=north, SVG: +Y=down) and adds padding.
+// Rotates +42° so Squires Path is horizontal at bottom (like the Benz survey).
+// All structure coords are pre-computed from the lot's (u,v) axis system,
+// so after rotation they appear as clean horizontal/vertical shapes.
 
 const CoordSystem = (() => {
-  const corners = SURVEY.corners;
+  const DEG2RAD = Math.PI / 180;
+  const ROTATION_DEG = 42;
 
-  // Transform: just flip Y for SVG
+  const corners = SURVEY.corners;
+  const cx = (corners.SW[0] + corners.NW[0] + corners.NE[0] + corners.SE[0]) / 4;
+  const cy = (corners.SW[1] + corners.NW[1] + corners.NE[1] + corners.SE[1]) / 4;
+
+  const cosR = Math.cos(ROTATION_DEG * DEG2RAD);
+  const sinR = Math.sin(ROTATION_DEG * DEG2RAD);
+
+  // Rotate point around lot centroid, then flip Y for SVG
   function toSVG(x, y) {
-    return [x, -y];
+    const dx = x - cx;
+    const dy = y - cy;
+    return [
+      cx + dx * cosR - dy * sinR,
+      -(cy + dx * sinR + dy * cosR)
+    ];
   }
 
   function transformPoints(pts) {
@@ -18,22 +32,19 @@ const CoordSystem = (() => {
     return toSVG(x, y);
   }
 
-  // Compute bounding box
-  const allCorners = [corners.SW, corners.NW, corners.NE, corners.SE];
-  const svgCorners = allCorners.map(c => toSVG(c[0], c[1]));
+  // Compute bounding box from transformed boundary corners
+  const allPts = [corners.SW, corners.NW, corners.NE, corners.SE];
+  const svgCorners = allPts.map(c => toSVG(c[0], c[1]));
 
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
   svgCorners.forEach(([x, y]) => {
-    minX = Math.min(minX, x);
-    minY = Math.min(minY, y);
-    maxX = Math.max(maxX, x);
-    maxY = Math.max(maxY, y);
+    minX = Math.min(minX, x); minY = Math.min(minY, y);
+    maxX = Math.max(maxX, x); maxY = Math.max(maxY, y);
   });
 
-  const PADDING = 40;
+  const PADDING = 45;
   const bounds = {
-    x: minX - PADDING,
-    y: minY - PADDING,
+    x: minX - PADDING, y: minY - PADDING,
     width: (maxX - minX) + PADDING * 2,
     height: (maxY - minY) + PADDING * 2
   };
@@ -76,14 +87,12 @@ const CoordSystem = (() => {
     return d;
   }
 
-  // Offset an edge inward by a distance (for setback lines)
   function offsetEdge(corner1Name, corner2Name, offset) {
     const c1 = corners[corner1Name];
     const c2 = corners[corner2Name];
     const dx = c2[0] - c1[0];
     const dy = c2[1] - c1[1];
     const len = Math.sqrt(dx * dx + dy * dy);
-    // Normal pointing inward (clockwise polygon)
     const nx = dy / len;
     const ny = -dx / len;
     return [
@@ -92,16 +101,5 @@ const CoordSystem = (() => {
     ];
   }
 
-  return {
-    toSVG,
-    transformPoints,
-    transformCenter,
-    toPointsStr,
-    toPathD,
-    toSmoothPathD,
-    offsetEdge,
-    viewBox,
-    bounds,
-    svgCorners
-  };
+  return { toSVG, transformPoints, transformCenter, toPointsStr, toPathD, toSmoothPathD, offsetEdge, viewBox, bounds, svgCorners };
 })();
