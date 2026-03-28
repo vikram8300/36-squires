@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>36 Squires Path — Driveway Renovation Study</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['"IBM Plex Mono"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; background: #fafaf8; }
+    .font-mono { font-family: 'IBM Plex Mono', monospace; }
+    .gantt-svg { max-height: 500px; }
+    @media print { .no-print { display: none; } }
+    .nav-link { transition: color 0.15s; }
+    .nav-link:hover { color: #1c1917; }
+    .option-btn { transition: all 0.15s; }
+    .material-card { transition: all 0.2s; }
+    .material-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+  </style>
+</head>
+<body class="text-stone-800">
+
+  <!-- ─── NAVIGATION ────────────────────────────────────────────── -->
+  <nav class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-stone-200 no-print">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div>
+        <span class="font-semibold text-stone-900">36 Squires Path</span>
+        <span class="text-stone-400 mx-2">|</span>
+        <span class="text-sm text-stone-500">Driveway Renovation Study</span>
+      </div>
+      <div class="hidden md:flex gap-5 text-sm text-stone-500">
+        <a href="#site-plan" class="nav-link">Site Plan</a>
+        <a href="#options" class="nav-link">Options</a>
+        <a href="#zoning" class="nav-link">Zoning</a>
+        <a href="#materials" class="nav-link">Materials</a>
+        <a href="#costs" class="nav-link">Costs</a>
+        <a href="#timeline" class="nav-link">Timeline</a>
+        <a href="#comparison" class="nav-link">Compare</a>
+      </div>
+      <button id="btn-pdf" class="no-print px-3 py-1.5 text-sm bg-stone-800 text-white rounded hover:bg-stone-700 transition-colors">
+        Download PDF
+      </button>
+    </div>
+  </nav>
+
+  <div id="main-content">
+
+    <!-- ─── HEADER ──────────────────────────────────────────────── -->
+    <header class="max-w-6xl mx-auto px-4 pt-12 pb-8">
+      <p class="text-sm font-mono text-stone-400 uppercase tracking-widest mb-2">Driveway Renovation Study</p>
+      <h1 class="text-4xl font-bold text-stone-900 mb-2">36 Squires Path</h1>
+      <p class="text-lg text-stone-500">East Hampton, NY 11937</p>
+      <div class="mt-6 flex flex-wrap gap-6 text-sm text-stone-500 font-mono">
+        <span>SCTM 300-184-2-9.1</span>
+        <span>Lot 6, Fox Hollow Estates</span>
+        <span>0.502 acres (21,901 sf)</span>
+        <span>Built 1972</span>
+      </div>
+      <div class="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg text-sm text-green-800">
+        <strong>Encroachment Status:</strong> RESOLVED — Written clearance obtained from Andrew Drake, Dept. of Land Acquisition & Management. Property is clear to proceed with permit applications.
+      </div>
+    </header>
+
+    <!-- ─── SITE PLAN ───────────────────────────────────────────── -->
+    <section id="site-plan" class="max-w-6xl mx-auto px-4 py-8">
+      <h2 class="text-2xl font-bold text-stone-900 mb-1">Site Plan</h2>
+      <p class="text-sm text-stone-500 mb-6">Interactive property diagram — select an option below to see the proposed layout. Survey by Gary Benz, L.S. (May 2021).</p>
+
+      <!-- Option Toggle Buttons -->
+      <div class="flex flex-wrap gap-2 mb-4 no-print">
+        <button data-option="A" class="option-btn px-4 py-2 text-sm font-medium rounded-lg border border-stone-300 bg-stone-800 text-white">
+          A: Wide Court + Detached Garage ★
+        </button>
+        <button data-option="B" class="option-btn px-4 py-2 text-sm font-medium rounded-lg border border-stone-300 bg-white text-stone-700 hover:bg-stone-50">
+          B: Attached Garage
+        </button>
+        <button data-option="C" class="option-btn px-4 py-2 text-sm font-medium rounded-lg border border-stone-300 bg-white text-stone-700 hover:bg-stone-50">
+          C: Carport (Phase 1)
+        </button>
+        <button data-option="D" class="option-btn px-4 py-2 text-sm font-medium rounded-lg border border-stone-300 bg-white text-stone-700 hover:bg-stone-50">
+          D: Compact Court
+        </button>
+      </div>
+
+      <!-- Layer Toggles -->
+      <div class="flex flex-wrap gap-4 mb-6 text-sm text-stone-500 no-print">
+        <label class="flex items-center gap-1.5 cursor-pointer">
+          <input type="checkbox" data-toggle-layer="setbacks" checked class="rounded text-stone-600">
+          <span>Setback Lines</span>
+        </label>
+        <label class="flex items-center gap-1.5 cursor-pointer">
+          <input type="checkbox" data-toggle-layer="current-drive" class="rounded text-stone-600">
+          <span>Existing Driveway</span>
+        </label>
+        <label class="flex items-center gap-1.5 cursor-pointer">
+          <input type="checkbox" data-toggle-layer="dimensions" checked class="rounded text-stone-600">
+          <span>Dimensions</span>
+        </label>
+      </div>
+
+      <!-- Diagram + Info Card -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 bg-white rounded-xl border border-stone-200 p-4 overflow-hidden">
+          <svg id="site-plan-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+        <div id="option-info-card" class="bg-white rounded-xl border border-stone-200 p-5">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── OPTION COMPARISON TABLE ─────────────────────────────── -->
+    <section id="options" class="max-w-6xl mx-auto px-4 py-8">
+      <h2 class="text-2xl font-bold text-stone-900 mb-1">Option Comparison</h2>
+      <p class="text-sm text-stone-500 mb-6">Side-by-side comparison of all four layout configurations.</p>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead>
+            <tr class="border-b-2 border-stone-300">
+              <th class="py-3 px-3 text-left text-stone-500 font-medium">Feature</th>
+              <th class="py-3 px-3 text-left font-medium text-stone-900">A: Wide Court + Detached ★</th>
+              <th class="py-3 px-3 text-left font-medium text-stone-700">B: Attached Garage</th>
+              <th class="py-3 px-3 text-left font-medium text-stone-700">C: Carport (Phase 1)</th>
+              <th class="py-3 px-3 text-left font-medium text-stone-700">D: Compact Court</th>
+            </tr>
+          </thead>
+          <tbody class="font-mono text-xs">
+            <tr class="border-b border-stone-100">
+              <td class="py-2.5 px-3 text-stone-500 font-sans text-sm">Entrance Width</td>
+              <td class="py-2.5 px-3">20'</td>
+              <td class="py-2.5 px-3">20'</td>
+              <td class="py-2.5 px-3">20'</td>
+              <td class="py-2.5 px-3">18'</td>
+            </tr>
+            <tr class="border-b border-stone-100 bg-stone-50/50">
+              <td class="py-2.5 px-3 text-stone-500 font-sans text-sm">Parking Court</td>
+              <td class="py-2.5 px-3">56' × 32' (1,792 sf)</td>
+              <td class="py-2.5 px-3">56' × 32' (1,792 sf)</td>
+              <td class="py-2.5 px-3">56' × 32' (1,792 sf)</td>
+              <td class="py-2.5 px-3">42' × 28' (1,176 sf)</td>
+            </tr>
+            <tr class="border-b border-stone-100">
+              <td class="py-2.5 px-3 text-stone-500 font-sans text-sm">Car Capacity</td>
+              <td class="py-2.5 px-3">3–4 cars</td>
+              <td class="py-2.5 px-3">3–4 cars</td>
+              <td class="py-2.5 px-3">3–4 cars</td>
+              <td class="py-2.5 px-3">2–3 cars</td>
+            </tr>
+            <tr class="border-b border-stone-100 bg-stone-50/50">
+              <td class="py-2.5 px-3 text-stone-500 font-sans text-sm">Garage Type</td>
+              <td class="py-2.5 px-3">Detached (624 sf)</td>
+              <td class="py-2.5 px-3">Attached (672 sf)</td>
+              <td class="py-2.5 px-3">Carport → Garage (576 sf)</td>
+              <td class="py-2.5 px-3">Detached (572 sf)</td>
+            </tr>
+            <tr class="border-b border-stone-100">
+              <td class="py-2.5 px-3 text-stone-500 font-sans text-sm">Zoning Class</td>
+              <td class="py-2.5 px-3">Accessory</td>
+              <td class="py-2.5 px-3">Principal</td>
+              <td class="py-2.5 px-3">Accessory</td>
+              <td class="py-2.5 px-3">Accessory</td>
+            </tr>
+            <tr class="border-b border-stone-100 bg-stone-50/50">
+              <td class="py-2.5 px-3 text-stone-500 font-sans text-sm">Variance Risk</td>
+              <td class="py-2.5 px-3 text-amber-700">Low</td>
+              <td class="py-2.5 px-3 text-green-700">None</td>
+              <td class="py-2.5 px-3 text-green-700">Lowest</td>
+              <td class="py-2.5 px-3 text-amber-700">Low</td>
+            </tr>
+            <tr class="border-b border-stone-100">
+              <td class="py-2.5 px-3 text-stone-500 font-sans text-sm">Building Coverage</td>
+              <td class="py-2.5 px-3">13.9% (of 20% max)</td>
+              <td class="py-2.5 px-3">14.1%</td>
+              <td class="py-2.5 px-3">13.7%</td>
+              <td class="py-2.5 px-3">13.7%</td>
+            </tr>
+            <tr class="border-b border-stone-100 bg-stone-50/50">
+              <td class="py-2.5 px-3 text-stone-500 font-sans text-sm">Lot Coverage</td>
+              <td class="py-2.5 px-3">29.2% (of 50% max)</td>
+              <td class="py-2.5 px-3">29.4%</td>
+              <td class="py-2.5 px-3">28.9%</td>
+              <td class="py-2.5 px-3">26.1%</td>
+            </tr>
+            <tr class="border-b border-stone-100">
+              <td class="py-2.5 px-3 text-stone-500 font-sans text-sm">Phases</td>
+              <td class="py-2.5 px-3">1</td>
+              <td class="py-2.5 px-3">1</td>
+              <td class="py-2.5 px-3">2</td>
+              <td class="py-2.5 px-3">1</td>
+            </tr>
+            <tr class="border-b border-stone-200">
+              <td class="py-2.5 px-3 text-stone-500 font-sans text-sm">Timeline</td>
+              <td class="py-2.5 px-3">12–20 wks</td>
+              <td class="py-2.5 px-3">14–24 wks</td>
+              <td class="py-2.5 px-3">Ph1: 10–16, Ph2: 4–8</td>
+              <td class="py-2.5 px-3">14–22 wks</td>
+            </tr>
+            <tr>
+              <td class="py-2.5 px-3 text-stone-500 font-sans text-sm">EV Ready</td>
+              <td class="py-2.5 px-3">Conduit (30')</td>
+              <td class="py-2.5 px-3">Conduit (15')</td>
+              <td class="py-2.5 px-3">Phase 2</td>
+              <td class="py-2.5 px-3">Conduit (50')</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ─── ZONING ANALYSIS ─────────────────────────────────────── -->
+    <section id="zoning" class="max-w-6xl mx-auto px-4 py-8">
+      <h2 class="text-2xl font-bold text-stone-900 mb-1">Zoning Analysis</h2>
+      <p class="text-sm text-stone-500 mb-6">Town of East Hampton, Chapter 255. All options well within coverage limits.</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Coverage Calculations -->
+        <div class="bg-white rounded-xl border border-stone-200 p-5">
+          <h3 class="font-semibold text-stone-900 mb-4">Coverage Calculations</h3>
+          <div class="space-y-4">
+            <div>
+              <div class="flex justify-between text-sm mb-1">
+                <span class="text-stone-600">Building Coverage (existing)</span>
+                <span class="font-mono text-stone-800">2,422 sf (11.1%)</span>
+              </div>
+              <div class="h-3 bg-stone-100 rounded-full overflow-hidden">
+                <div class="h-full bg-stone-500 rounded-full" style="width: 55.5%"></div>
+              </div>
+              <div class="flex justify-between text-xs text-stone-400 mt-1">
+                <span>0 sf</span>
+                <span>Max: 4,380 sf (20%)</span>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm mb-1">
+                <span class="text-stone-600">Lot Coverage (existing)</span>
+                <span class="font-mono text-stone-800">3,969 sf (18.1%)</span>
+              </div>
+              <div class="h-3 bg-stone-100 rounded-full overflow-hidden">
+                <div class="h-full bg-stone-400 rounded-full" style="width: 36.2%"></div>
+              </div>
+              <div class="flex justify-between text-xs text-stone-400 mt-1">
+                <span>0 sf</span>
+                <span>Max: 10,951 sf (50%)</span>
+              </div>
+            </div>
+            <div class="pt-3 border-t border-stone-100">
+              <p class="text-sm text-stone-600"><strong>Remaining capacity:</strong></p>
+              <p class="text-sm font-mono text-stone-800">Building: 1,958 sf available</p>
+              <p class="text-sm font-mono text-stone-800">Lot: 6,982 sf available</p>
+              <p class="text-xs text-green-700 mt-2">All four options fit comfortably within limits.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Setback Rules -->
+        <div class="bg-white rounded-xl border border-stone-200 p-5">
+          <h3 class="font-semibold text-stone-900 mb-4">Setback Requirements</h3>
+          <div class="space-y-3 text-sm">
+            <div class="flex justify-between py-2 border-b border-stone-100">
+              <span class="text-stone-600">Front (Squires Path)</span>
+              <span class="font-mono font-medium">35'</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-stone-100">
+              <span class="text-stone-600">Side — West (toward Lot 38)</span>
+              <span class="font-mono font-medium">15'</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-stone-100">
+              <span class="text-stone-600">Side — East (preserve)</span>
+              <span class="font-mono font-medium">15'</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-stone-100">
+              <span class="text-stone-600">Rear (preserve)</span>
+              <span class="font-mono font-medium">25'</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-stone-100">
+              <span class="text-stone-600">Accessory side/rear setback</span>
+              <span class="font-mono font-medium">10'</span>
+            </div>
+            <div class="flex justify-between py-2">
+              <span class="text-stone-600">Min separation (garage–house)</span>
+              <span class="font-mono font-medium">10'</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Accessory vs Principal -->
+        <div class="bg-white rounded-xl border border-stone-200 p-5">
+          <h3 class="font-semibold text-stone-900 mb-3">Detached Garage (Accessory)</h3>
+          <ul class="text-sm text-stone-600 space-y-1.5">
+            <li>• Max 600 sf gross floor area</li>
+            <li>• Must be behind front building line</li>
+            <li>• Max height: 15' flat / 20' gabled</li>
+            <li>• Min 10' from dwelling</li>
+            <li>• No habitable space or plumbing</li>
+            <li>• Side/rear setbacks: 10–15'</li>
+          </ul>
+          <p class="mt-3 text-xs text-stone-400">Applies to Options A, C, D</p>
+        </div>
+
+        <div class="bg-white rounded-xl border border-stone-200 p-5">
+          <h3 class="font-semibold text-stone-900 mb-3">Attached Garage (Principal Structure)</h3>
+          <ul class="text-sm text-stone-600 space-y-1.5">
+            <li>• No 600 sf cap — limited by coverage only</li>
+            <li>• Must meet principal structure setbacks</li>
+            <li>• Front: 35', Sides: 15', Rear: 25'</li>
+            <li>• Requires architectural plans</li>
+            <li>• Can include interior door to house</li>
+            <li>• Combined footprint ≤ 20% building coverage</li>
+          </ul>
+          <p class="mt-3 text-xs text-stone-400">Applies to Option B</p>
+        </div>
+      </div>
+
+      <!-- Variance Narrative -->
+      <div class="mt-6 bg-amber-50 border border-amber-200 rounded-xl p-5">
+        <h3 class="font-semibold text-stone-900 mb-3">Variance Argument (if needed)</h3>
+        <p class="text-sm text-stone-600 mb-3">If the garage placement requires a ZBA variance, the five-factor test is favorable:</p>
+        <div class="space-y-2 text-sm">
+          <div class="flex gap-2">
+            <span class="text-green-600 font-bold mt-0.5">1.</span>
+            <div>
+              <strong class="text-stone-800">Reasonable Return:</strong>
+              <span class="text-stone-600"> Only home on Squires Path without covered vehicle storage. Diminishes utility and resale.</span>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <span class="text-green-600 font-bold mt-0.5">2.</span>
+            <div>
+              <strong class="text-stone-800">Unique Hardship:</strong>
+              <span class="text-stone-600"> Nature Preserve on two sides eliminates ~50% of buildable envelope. Not shared by neighbors.</span>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <span class="text-green-600 font-bold mt-0.5">3.</span>
+            <div>
+              <strong class="text-stone-800">Neighborhood Character:</strong>
+              <span class="text-stone-600"> Under 600 sf, matching architecture. Multiple neighbors have garages. Screened by landscaping.</span>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <span class="text-green-600 font-bold mt-0.5">4.</span>
+            <div>
+              <strong class="text-stone-800">Not Self-Created:</strong>
+              <span class="text-stone-600"> Preserve boundaries set in 1968 subdivision. Owners purchased 2021 with pre-existing constraints.</span>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <span class="text-green-600 font-bold mt-0.5">5.</span>
+            <div>
+              <strong class="text-stone-800">Minimum Variance:</strong>
+              <span class="text-stone-600"> Smallest feasible garage. Property stays at ~14% building coverage vs 20% max.</span>
+            </div>
+          </div>
+        </div>
+        <p class="mt-3 text-xs text-stone-500">ZBA: 159 Pantigo Road, (631) 324-4143. Typical timeline: 2–4 months.</p>
+      </div>
+    </section>
+
+    <!-- ─── MATERIALS ───────────────────────────────────────────── -->
+    <section id="materials" class="max-w-6xl mx-auto px-4 py-8">
+      <h2 class="text-2xl font-bold text-stone-900 mb-1">Surface Materials</h2>
+      <p class="text-sm text-stone-500 mb-6">Pricing reflects East End Long Island, Q1 2026. Select a material to update cost estimates below.</p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Belgian Block -->
+        <div data-material="belgianBlock" class="material-card cursor-pointer bg-white rounded-xl border border-stone-200 p-4 ring-2 ring-stone-800">
+          <div class="h-8 rounded mb-3" style="background: linear-gradient(135deg, #a89882 25%, #8b7d6b 25%, #8b7d6b 50%, #a89882 50%, #a89882 75%, #8b7d6b 75%); background-size: 12px 12px;"></div>
+          <h4 class="font-semibold text-stone-900 text-sm">Belgian Block</h4>
+          <p class="font-mono text-xs text-stone-600 mt-1">$22–38 / sf</p>
+          <p class="text-xs text-stone-500 mt-2">100+ year lifespan. Classic Hamptons aesthetic. Premium option.</p>
+          <div class="mt-3 flex flex-wrap gap-1">
+            <span class="text-xs px-1.5 py-0.5 bg-green-50 text-green-700 rounded">Excellent Drainage</span>
+            <span class="text-xs px-1.5 py-0.5 bg-blue-50 text-blue-700 rounded">Heritage</span>
+          </div>
+        </div>
+
+        <!-- Pavers -->
+        <div data-material="pavers" class="material-card cursor-pointer bg-white rounded-xl border border-stone-200 p-4">
+          <div class="h-8 rounded mb-3" style="background: linear-gradient(135deg, #b8a99a 25%, #9a8b7c 25%, #9a8b7c 50%, #b8a99a 50%, #b8a99a 75%, #9a8b7c 75%); background-size: 16px 16px;"></div>
+          <h4 class="font-semibold text-stone-900 text-sm">Concrete Pavers / Bluestone</h4>
+          <p class="font-mono text-xs text-stone-600 mt-1">$15–28 / sf</p>
+          <p class="text-xs text-stone-500 mt-2">Wide variety of patterns. Good balance of aesthetics and cost.</p>
+          <div class="mt-3 flex flex-wrap gap-1">
+            <span class="text-xs px-1.5 py-0.5 bg-green-50 text-green-700 rounded">Good Drainage</span>
+            <span class="text-xs px-1.5 py-0.5 bg-blue-50 text-blue-700 rounded">Versatile</span>
+          </div>
+        </div>
+
+        <!-- Asphalt -->
+        <div data-material="asphalt" class="material-card cursor-pointer bg-white rounded-xl border border-stone-200 p-4">
+          <div class="h-8 rounded mb-3" style="background: linear-gradient(135deg, #4a4a4a, #333);"></div>
+          <h4 class="font-semibold text-stone-900 text-sm">Asphalt</h4>
+          <p class="font-mono text-xs text-stone-600 mt-1">$7–15 / sf</p>
+          <p class="text-xs text-stone-500 mt-2">Most cost-effective. Fast install. Smooth surface.</p>
+          <div class="mt-3 flex flex-wrap gap-1">
+            <span class="text-xs px-1.5 py-0.5 bg-amber-50 text-amber-700 rounded">Budget</span>
+            <span class="text-xs px-1.5 py-0.5 bg-red-50 text-red-700 rounded">Poor Drainage</span>
+          </div>
+        </div>
+
+        <!-- Gravel -->
+        <div data-material="gravel" class="material-card cursor-pointer bg-white rounded-xl border border-stone-200 p-4">
+          <div class="h-8 rounded mb-3" style="background: radial-gradient(circle at 30% 40%, #b0a696 2px, transparent 2px), radial-gradient(circle at 70% 60%, #c9bfaf 2px, transparent 2px), radial-gradient(circle at 50% 20%, #b0a696 1.5px, transparent 1.5px), #c9bfaf;"></div>
+          <h4 class="font-semibold text-stone-900 text-sm">Crushed Stone / Gravel</h4>
+          <p class="font-mono text-xs text-stone-600 mt-1">$4–10 / sf</p>
+          <p class="text-xs text-stone-500 mt-2">Lowest cost. Fully permeable. Casual East End feel.</p>
+          <div class="mt-3 flex flex-wrap gap-1">
+            <span class="text-xs px-1.5 py-0.5 bg-green-50 text-green-700 rounded">Best Drainage</span>
+            <span class="text-xs px-1.5 py-0.5 bg-amber-50 text-amber-700 rounded">Lowest Cost</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detailed Material Comparison Table -->
+      <div class="mt-8 overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead>
+            <tr class="border-b-2 border-stone-300">
+              <th class="py-3 px-3 text-left text-stone-500 font-medium">Attribute</th>
+              <th class="py-3 px-3 text-left font-medium">Belgian Block</th>
+              <th class="py-3 px-3 text-left font-medium">Pavers / Bluestone</th>
+              <th class="py-3 px-3 text-left font-medium">Asphalt</th>
+              <th class="py-3 px-3 text-left font-medium">Gravel</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b border-stone-100">
+              <td class="py-2 px-3 text-stone-500">Cost / sf</td>
+              <td class="py-2 px-3 font-mono text-xs">$22–38</td>
+              <td class="py-2 px-3 font-mono text-xs">$15–28</td>
+              <td class="py-2 px-3 font-mono text-xs">$7–15</td>
+              <td class="py-2 px-3 font-mono text-xs">$4–10</td>
+            </tr>
+            <tr class="border-b border-stone-100 bg-stone-50/50">
+              <td class="py-2 px-3 text-stone-500">Lifespan</td>
+              <td class="py-2 px-3 text-xs">100+ years</td>
+              <td class="py-2 px-3 text-xs">25–50 years</td>
+              <td class="py-2 px-3 text-xs">15–25 years</td>
+              <td class="py-2 px-3 text-xs">Indefinite</td>
+            </tr>
+            <tr class="border-b border-stone-100">
+              <td class="py-2 px-3 text-stone-500">Install Time</td>
+              <td class="py-2 px-3 text-xs">2–3 weeks</td>
+              <td class="py-2 px-3 text-xs">1–2 weeks</td>
+              <td class="py-2 px-3 text-xs">3–5 days</td>
+              <td class="py-2 px-3 text-xs">2–4 days</td>
+            </tr>
+            <tr class="border-b border-stone-100 bg-stone-50/50">
+              <td class="py-2 px-3 text-stone-500">Drainage</td>
+              <td class="py-2 px-3 text-xs text-green-700">Excellent</td>
+              <td class="py-2 px-3 text-xs text-green-700">Good</td>
+              <td class="py-2 px-3 text-xs text-red-600">Poor</td>
+              <td class="py-2 px-3 text-xs text-green-700">Excellent</td>
+            </tr>
+            <tr class="border-b border-stone-100">
+              <td class="py-2 px-3 text-stone-500">Hamptons Fit</td>
+              <td class="py-2 px-3 text-xs">Perfect</td>
+              <td class="py-2 px-3 text-xs">Very Good</td>
+              <td class="py-2 px-3 text-xs">Common</td>
+              <td class="py-2 px-3 text-xs">Good — casual</td>
+            </tr>
+            <tr class="border-b border-stone-100 bg-stone-50/50">
+              <td class="py-2 px-3 text-stone-500">Maintenance</td>
+              <td class="py-2 px-3 text-xs">Re-sand joints 3–5yr</td>
+              <td class="py-2 px-3 text-xs">Re-sand + seal 2–3yr</td>
+              <td class="py-2 px-3 text-xs">Seal-coat every 2–3yr</td>
+              <td class="py-2 px-3 text-xs">Regrade 1–2x/yr</td>
+            </tr>
+            <tr>
+              <td class="py-2 px-3 text-stone-500">Snow Removal</td>
+              <td class="py-2 px-3 text-xs">Good (plow-safe)</td>
+              <td class="py-2 px-3 text-xs">Good</td>
+              <td class="py-2 px-3 text-xs">Excellent</td>
+              <td class="py-2 px-3 text-xs">Difficult</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ─── COST BREAKDOWN ──────────────────────────────────────── -->
+    <section id="costs" class="max-w-6xl mx-auto px-4 py-8">
+      <h2 class="text-2xl font-bold text-stone-900 mb-1">Cost Breakdown</h2>
+      <p class="text-sm text-stone-500 mb-2">Estimates for each option with selected surface material. Costs reflect East End Long Island Q1 2026 pricing.</p>
+      <p class="text-sm text-stone-600 mb-6">Selected material: <strong id="selected-material-label">Belgian Block (Granite Cobble)</strong> — click a material card above to change.</p>
+
+      <div class="bg-white rounded-xl border border-stone-200 overflow-hidden">
+        <table class="w-full text-sm border-collapse">
+          <thead>
+            <tr class="border-b-2 border-stone-300 bg-stone-50">
+              <th class="py-3 px-3 text-left text-stone-500 font-medium w-20"></th>
+              <th class="py-3 px-3 text-left text-stone-500 font-medium">Configuration</th>
+              <th class="py-3 px-3 text-right text-stone-500 font-medium">Low Estimate</th>
+              <th class="py-3 px-3 text-right text-stone-500 font-medium">High Estimate</th>
+            </tr>
+          </thead>
+          <tbody id="cost-table-body">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <p class="mt-3 text-xs text-stone-400">
+        Estimates are approximate ranges. Actual costs depend on contractor selection, material availability, and site conditions.
+        Get 3+ contractor bids before committing. Costs exclude variance fees ($5K–$12K) if applicable.
+      </p>
+    </section>
+
+    <!-- ─── TIMELINE ────────────────────────────────────────────── -->
+    <section id="timeline" class="max-w-6xl mx-auto px-4 py-8">
+      <h2 class="text-2xl font-bold text-stone-900 mb-1">Project Timeline</h2>
+      <p class="text-sm text-stone-500 mb-6">Critical path: Attorney → Architect → Permit → Construction → Inspection. Typical total: 18–20 weeks.</p>
+
+      <div class="bg-white rounded-xl border border-stone-200 p-4 overflow-x-auto">
+        <div id="gantt-chart"></div>
+      </div>
+
+      <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+          <p class="text-sm font-semibold text-green-900">Best Case</p>
+          <p class="text-2xl font-mono font-bold text-green-800 mt-1">12 weeks</p>
+          <p class="text-xs text-green-700 mt-1">No variance, fast permit review</p>
+        </div>
+        <div class="bg-stone-50 border border-stone-200 rounded-lg p-4">
+          <p class="text-sm font-semibold text-stone-900">Typical</p>
+          <p class="text-2xl font-mono font-bold text-stone-800 mt-1">18–20 weeks</p>
+          <p class="text-xs text-stone-600 mt-1">Standard permit timeline</p>
+        </div>
+        <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+          <p class="text-sm font-semibold text-amber-900">Worst Case</p>
+          <p class="text-2xl font-mono font-bold text-amber-800 mt-1">28–32 weeks</p>
+          <p class="text-xs text-amber-700 mt-1">Variance required + summer delays</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── GARAGE vs CARPORT ───────────────────────────────────── -->
+    <section id="comparison" class="max-w-6xl mx-auto px-4 py-8">
+      <h2 class="text-2xl font-bold text-stone-900 mb-6">Garage vs. Carport</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white rounded-xl border border-stone-200 p-5">
+          <h3 class="font-semibold text-stone-900 mb-4 text-lg">Enclosed Garage</h3>
+          <div class="space-y-3 text-sm">
+            <div class="flex justify-between border-b border-stone-100 pb-2">
+              <span class="text-stone-500">Structure Cost</span>
+              <span class="font-mono">$12K–$22K</span>
+            </div>
+            <div class="flex justify-between border-b border-stone-100 pb-2">
+              <span class="text-stone-500">Weather Protection</span>
+              <span class="text-green-700">Full</span>
+            </div>
+            <div class="flex justify-between border-b border-stone-100 pb-2">
+              <span class="text-stone-500">Security</span>
+              <span class="text-green-700">Locked</span>
+            </div>
+            <div class="flex justify-between border-b border-stone-100 pb-2">
+              <span class="text-stone-500">Storage</span>
+              <span class="text-green-700">Yes — enclosed</span>
+            </div>
+            <div class="flex justify-between border-b border-stone-100 pb-2">
+              <span class="text-stone-500">Property Value Impact</span>
+              <span class="text-green-700">+$15K–$30K</span>
+            </div>
+            <div class="flex justify-between border-b border-stone-100 pb-2">
+              <span class="text-stone-500">Permit Complexity</span>
+              <span class="text-amber-700">Standard building permit</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-stone-500">EV Charging</span>
+              <span class="text-green-700">Conduit run at build</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-stone-200 p-5">
+          <h3 class="font-semibold text-stone-900 mb-4 text-lg">Open Carport</h3>
+          <div class="space-y-3 text-sm">
+            <div class="flex justify-between border-b border-stone-100 pb-2">
+              <span class="text-stone-500">Structure Cost</span>
+              <span class="font-mono">$6K–$12K</span>
+            </div>
+            <div class="flex justify-between border-b border-stone-100 pb-2">
+              <span class="text-stone-500">Weather Protection</span>
+              <span class="text-amber-700">Roof only (open sides)</span>
+            </div>
+            <div class="flex justify-between border-b border-stone-100 pb-2">
+              <span class="text-stone-500">Security</span>
+              <span class="text-red-600">Open</span>
+            </div>
+            <div class="flex justify-between border-b border-stone-100 pb-2">
+              <span class="text-stone-500">Storage</span>
+              <span class="text-red-600">Limited — exposed</span>
+            </div>
+            <div class="flex justify-between border-b border-stone-100 pb-2">
+              <span class="text-stone-500">Property Value Impact</span>
+              <span class="text-amber-700">+$5K–$10K</span>
+            </div>
+            <div class="flex justify-between border-b border-stone-100 pb-2">
+              <span class="text-stone-500">Permit Complexity</span>
+              <span class="text-green-700">Simpler — may not need full permit</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-stone-500">Phase 2 → Garage</span>
+              <span class="font-mono">+$10K–$25K</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Attached vs Detached -->
+      <h2 class="text-2xl font-bold text-stone-900 mt-12 mb-6">Attached vs. Detached Garage</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white rounded-xl border border-stone-200 p-5">
+          <h3 class="font-semibold text-stone-900 mb-4 text-lg">Detached Garage</h3>
+          <div class="space-y-3 text-sm">
+            <div class="flex justify-between border-b border-stone-100 pb-2">
+              <span class="text-stone-500">Zoning Class</span>
+              <span class="font-mono">Accessory Structure</span>
+            </div>
+            <div class="flex justify-between border-b border-stone-100 pb-2">
+              <span class="text-stone-500">Size Limit</span>
+              <span class="font-mono text-amber-700">600 sf max</span>
+            </div>
+            <div class="flex justify-between border-b border-stone-100 pb-2">
+              <span class="text-stone-500">Setbacks</span>
+              <span class="font-mono">10' side/rear</span>
+            </div>
+            <div class="flex justify-between border-b border-stone-100 pb-2">
+              <span class="text-stone-500">Construction Impact</span>
+              <span class="text-green-700">None to house</span>
+            </div>
+            <div class="flex justify-between border-b border-stone-100 pb-2">
+              <span class="text-stone-500">Placement Flexibility</span>
+              <span class="text-green-700">More flexible</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-stone-500">Weather Walk</span>
+              <span class="text-amber-700">Exposed walk to house</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-stone-200 p-5">
+          <h3 class="font-semibold text-stone-900 mb-4 text-lg">Attached Garage</h3>
+          <div class="space-y-3 text-sm">
+            <div class="flex justify-between border-b border-stone-100 pb-2">
+              <span class="text-stone-500">Zoning Class</span>
+              <span class="font-mono">Principal Structure</span>
+            </div>
+            <div class="flex justify-between border-b border-stone-100 pb-2">
+              <span class="text-stone-500">Size Limit</span>
+              <span class="font-mono text-green-700">No cap (coverage only)</span>
+            </div>
+            <div class="flex justify-between border-b border-stone-100 pb-2">
+              <span class="text-stone-500">Setbacks</span>
+              <span class="font-mono">35' front, 15' side, 25' rear</span>
+            </div>
+            <div class="flex justify-between border-b border-stone-100 pb-2">
+              <span class="text-stone-500">Construction Impact</span>
+              <span class="text-amber-700">Ties into house structure</span>
+            </div>
+            <div class="flex justify-between border-b border-stone-100 pb-2">
+              <span class="text-stone-500">Convenience</span>
+              <span class="text-green-700">Interior door access</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-stone-500">Cost Premium</span>
+              <span class="text-amber-700">+20–40% vs detached</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── RECOMMENDED PROFESSIONALS ───────────────────────────── -->
+    <section class="max-w-6xl mx-auto px-4 py-8">
+      <h2 class="text-2xl font-bold text-stone-900 mb-6">Recommended Professionals</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white rounded-xl border border-stone-200 p-5">
+          <h3 class="font-semibold text-stone-900 mb-3">Zoning Attorneys</h3>
+          <div class="space-y-3 text-sm">
+            <div>
+              <p class="font-medium text-stone-800">Twomey, Latham, Shea, Kelley, Dubin & Quartararo</p>
+              <p class="text-stone-500">Premier East End zoning firm. Riverhead. suffolklaw.com</p>
+            </div>
+            <div>
+              <p class="font-medium text-stone-800">Sill & Sill</p>
+              <p class="text-stone-500">Smaller firm, residential zoning in East Hampton</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-stone-200 p-5">
+          <h3 class="font-semibold text-stone-900 mb-3">Contractors</h3>
+          <div class="space-y-3 text-sm">
+            <div>
+              <p class="font-medium text-stone-800">J.A. Land Development</p>
+              <p class="text-stone-500">Full-service hardscape: driveways, cobblestone, bluestone, grading</p>
+            </div>
+            <div>
+              <p class="font-medium text-stone-800">All Purpose Paving (NY)</p>
+              <p class="text-stone-500">Family-owned, East End. nyallpurposepaving.com</p>
+            </div>
+            <div>
+              <p class="font-medium text-stone-800">APM O'Neill & Sons</p>
+              <p class="text-stone-500">30+ years East Hampton. (631) 480-3238</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-stone-200 p-5">
+          <h3 class="font-semibold text-stone-900 mb-3">Town Contacts</h3>
+          <div class="space-y-3 text-sm">
+            <div>
+              <p class="font-medium text-stone-800">Building Department</p>
+              <p class="text-stone-500">300 Pantigo Place, Suite 104. (631) 324-4142</p>
+            </div>
+            <div>
+              <p class="font-medium text-stone-800">Zoning Board of Appeals</p>
+              <p class="text-stone-500">159 Pantigo Road. (631) 324-4143</p>
+            </div>
+            <div>
+              <p class="font-medium text-stone-800">Land Acquisition — Andrew Drake</p>
+              <p class="text-stone-500">159 Pantigo Road. (631) 324-7420. adrake@ehamptonny.gov</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-stone-200 p-5">
+          <h3 class="font-semibold text-stone-900 mb-3">Surveyor</h3>
+          <div class="text-sm">
+            <p class="font-medium text-stone-800">Gary Benz, L.S.</p>
+            <p class="text-stone-500">Surveying and Land Planning</p>
+            <p class="text-stone-500">527-B Hawkins Avenue, Ronkonkoma, NY 11779</p>
+            <p class="text-stone-500">(631) 648-9348 | GaryBenzLS@Yahoo.com</p>
+            <p class="text-xs text-stone-400 mt-2">2021 survey is valid (less than 10 years old)</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── NEXT STEPS ──────────────────────────────────────────── -->
+    <section class="max-w-6xl mx-auto px-4 py-8">
+      <h2 class="text-2xl font-bold text-stone-900 mb-6">Critical Path — Next Steps</h2>
+      <div class="bg-white rounded-xl border border-stone-200 p-5">
+        <div class="space-y-4">
+          <div class="flex gap-4 items-start">
+            <div class="w-8 h-8 rounded-full bg-stone-800 text-white flex items-center justify-center text-sm font-bold flex-shrink-0">1</div>
+            <div>
+              <p class="font-semibold text-stone-900">Engage Zoning Attorney</p>
+              <p class="text-sm text-stone-600">Determine if variance is needed for garage placement. Twomey Latham or Sill & Sill recommended. Week 1–2.</p>
+            </div>
+          </div>
+          <div class="flex gap-4 items-start">
+            <div class="w-8 h-8 rounded-full bg-stone-800 text-white flex items-center justify-center text-sm font-bold flex-shrink-0">2</div>
+            <div>
+              <p class="font-semibold text-stone-900">Engage Architect for Site Plan</p>
+              <p class="text-sm text-stone-600">1/4" scale plans required for permit application. Must show clearing envelope. Week 2–4.</p>
+            </div>
+          </div>
+          <div class="flex gap-4 items-start">
+            <div class="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center text-sm font-bold flex-shrink-0">&#10003;</div>
+            <div>
+              <p class="font-semibold text-stone-900 line-through">Get Encroachment Clearance Letter</p>
+              <p class="text-sm text-green-700">DONE — Written resolution obtained from Andrew Drake.</p>
+            </div>
+          </div>
+          <div class="flex gap-4 items-start">
+            <div class="w-8 h-8 rounded-full bg-stone-800 text-white flex items-center justify-center text-sm font-bold flex-shrink-0">3</div>
+            <div>
+              <p class="font-semibold text-stone-900">Solicit 3 Contractor Bids</p>
+              <p class="text-sm text-stone-600">Get bids from J.A. Land Development, All Purpose Paving, APM O'Neill. Can run concurrent with permitting. Week 3–6.</p>
+            </div>
+          </div>
+          <div class="flex gap-4 items-start">
+            <div class="w-8 h-8 rounded-full bg-stone-800 text-white flex items-center justify-center text-sm font-bold flex-shrink-0">4</div>
+            <div>
+              <p class="font-semibold text-stone-900">Submit Building Permit</p>
+              <p class="text-sm text-stone-600">Two sets of plans, contractor signature (notarized), insurance cert, survey. Week 4–5.</p>
+            </div>
+          </div>
+          <div class="flex gap-4 items-start">
+            <div class="w-8 h-8 rounded-full bg-stone-800 text-white flex items-center justify-center text-sm font-bold flex-shrink-0">5</div>
+            <div>
+              <p class="font-semibold text-stone-900">Begin Construction</p>
+              <p class="text-sm text-stone-600">After permit approval (6–8 week review). Demo → excavation → base → surface → garage → landscaping. 4–6 weeks.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── FOOTER ──────────────────────────────────────────────── -->
+    <footer class="max-w-6xl mx-auto px-4 py-8 border-t border-stone-200">
+      <div class="flex flex-wrap justify-between items-start gap-4 text-sm text-stone-500">
+        <div>
+          <p class="font-medium text-stone-700">36 Squires Path Driveway Renovation Study</p>
+          <p>Prepared March 2026</p>
+          <p class="mt-2 text-xs text-stone-400 max-w-md">
+            This document is for planning purposes only. All setback distances, coverage calculations, and zoning rules
+            should be verified with the Town of East Hampton Building Department before filing any permit applications.
+            Cost estimates are approximate ranges based on Q1 2026 East End pricing.
+          </p>
+        </div>
+        <div class="text-right">
+          <p class="font-mono text-xs text-stone-400">Survey: Gary Benz, L.S. (May 2021)</p>
+          <p class="font-mono text-xs text-stone-400">SCTM 300-184-2-9.1</p>
+        </div>
+      </div>
+    </footer>
+
+  </div><!-- /main-content -->
+
+  <!-- ─── SCRIPTS ───────────────────────────────────────────────── -->
+  <script src="data/survey.js"></script>
+  <script src="data/materials.js"></script>
+  <script src="data/options.js"></script>
+  <script src="data/zoning.js"></script>
+  <script src="data/timeline.js"></script>
+  <script src="js/coordinates.js"></script>
+  <script src="js/diagrams.js"></script>
+  <script src="js/interactions.js"></script>
+
+</body>
+</html>
